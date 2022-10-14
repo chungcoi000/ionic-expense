@@ -1,0 +1,7 @@
+{
+  "name": "M-expense-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
