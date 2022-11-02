@@ -31,7 +31,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     fetchTrips().then(_ => {
     });
-  }, []);
+  }, [trips]);
 
   const deleteTrip = async (id: any) => {
     presentAlert({

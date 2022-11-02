@@ -1,16 +1,16 @@
 import {
-  IonButton,
-  IonContent, IonDatetime,
+  IonButton, IonCol,
+  IonContent, IonDatetime, IonGrid,
   IonHeader,
   IonInput,
   IonItem, IonLabel, IonModal,
-  IonPage, IonPopover, IonSelect, IonSelectOption, IonTextarea,
+  IonPage, IonPopover, IonRow, IonSelect, IonSelectOption, IonTextarea,
   IonTitle, IonToast,
   IonToolbar
 } from "@ionic/react";
 import React, {useState} from "react";
 import "./TripForm.css";
-import {Form, Formik, FormikHelpers} from "formik";
+import {Form, Formik, FormikHelpers, FormikValues} from "formik";
 import * as yup from "yup";
 import {addTrip} from "../../databaseHandler";
 import {useHistory} from "react-router";
@@ -31,7 +31,11 @@ const validationSchema = yup.object({
   duration: yup
     .number()
     .nullable()
-    .required("Date is required"),
+    .required("Duration is required"),
+  contact: yup
+    .string()
+    .nullable()
+    .required("Contact is required"),
 });
 
 const TripForm: React.FC = () => {
@@ -40,9 +44,8 @@ const TripForm: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
   const [value, setValue] = useState<any>();
+  const [reset, setReset] = useState<any>();
   const history = useHistory();
-
-  console.log(value);
 
   const dateSelectedHandler = (e: any) => {
     const selectedDate = new Date(e.detail.value);
@@ -53,15 +56,25 @@ const TripForm: React.FC = () => {
     setRisk(e.detail.value);
   }
 
-  const addTripDetail = async (values: any, actions: FormikHelpers<any>) => {
+  console.log("values", value);
+
+  const tripDetail = (values: any) => {
     let tripInfo = {...values, risk};
     setValue(tripInfo);
-    const res = await addTrip(tripInfo);
-    if (res) {
-      setOpen(true);
-      actions.resetForm();
-      setRisk("no");
-      setDate("");
+    setModal(true);
+  }
+
+  const addTripDetail = async () => {
+    if (value) {
+      const res = await addTrip(value);
+      if (res) {
+        setModal(false);
+        setOpen(true);
+        reset.resetForm();
+        setDate("");
+        setRisk("no");
+        history.push("/home");
+      }
     }
   }
 
@@ -81,14 +94,15 @@ const TripForm: React.FC = () => {
             initialValues={{
               destination: null,
               name: null,
+              contact: null,
               date: null,
               duration: null,
               description: null,
             }}
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
-              addTripDetail(values, actions).then(() => {
-              })
+              tripDetail(values);
+              setReset(actions);
             }}
           >
             {formikProps => (
@@ -158,6 +172,22 @@ const TripForm: React.FC = () => {
                 </p>
 
                 <IonItem>
+                  <IonLabel position="floating">
+                    Contact
+                  </IonLabel>
+                  <IonInput
+                    type="text"
+                    placeholder="Contact"
+                    name="contact"
+                    value={formikProps.values.contact}
+                    onIonChange={formikProps.handleChange}
+                  />
+                </IonItem>
+                <p className="error">
+                  {formikProps.touched.contact && formikProps.errors.contact}
+                </p>
+
+                <IonItem>
                   <IonLabel position="floating">Risk</IonLabel>
                   <IonSelect
                     name="risk"
@@ -181,16 +211,61 @@ const TripForm: React.FC = () => {
                   ></IonTextarea>
                 </IonItem>
                 <IonButton style={{margin: "20px"}} color="tertiary" expand="block" type="submit">SAVE</IonButton>
-                <IonModal isOpen={modal} title="Confirm information" onDidDismiss={() => setModal(false)}>
-                  <p>Test</p>
-                  <IonButton onClick={() => setModal(false)}>Close</IonButton>
-                  <IonButton type="submit">Save</IonButton>
-
-                </IonModal>
               </Form>
             )}
           </Formik>
         </div>
+
+        <IonModal isOpen={modal} onDidDismiss={() => setModal(false)}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Confirm Trip</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            {
+              value && (
+                <>
+                  <IonItem>
+                    <IonLabel>Trip name: {value.name}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip destination: {value.destination}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip date: {value.date}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip duration: {value.duration}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip contact: {value.contact}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip risk: {value.risk}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Trip description: {value.description}</IonLabel>
+                  </IonItem>
+                </>
+              )
+            }
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <IonButton style={{display: "flex"}}
+                             onClick={() => setModal(false)}>Cancel</IonButton>
+                </IonCol>
+                <IonCol>
+                  <IonButton style={{display: "flex"}} onClick={() => addTripDetail().then(_ => {
+                  })}>
+                    Save
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
+        </IonModal>
 
         <IonToast
           isOpen={open}

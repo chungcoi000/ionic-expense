@@ -5,5 +5,6 @@ export interface Trip {
   date?: string,
   duration?: number,
   risk?: string,
+  contact?: string,
   description?: string
 }

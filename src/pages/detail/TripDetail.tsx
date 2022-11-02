@@ -33,7 +33,11 @@ const validationSchema = yup.object({
   duration: yup
     .number()
     .nullable()
-    .required("Date is required"),
+    .required("Duration is required"),
+  contact: yup
+    .string()
+    .nullable()
+    .required("Contact is required"),
 });
 
 const TripDetail: React.FC = () => {
@@ -73,11 +77,12 @@ const TripDetail: React.FC = () => {
 
   const updateDetail = async (values: any) => {
     let tripInfo = {...values, risk};
-    console.log("tripInfo", tripInfo);
-    console.log("id", id);
 
-    await updateTripById(id, tripInfo);
-
+    const data = await updateTripById(id, tripInfo);
+    if (data === id) {
+      setOpen(true);
+      history.push("/home");
+    }
   }
 
   return (
@@ -99,6 +104,7 @@ const TripDetail: React.FC = () => {
               name: trip?.name,
               date: trip?.date,
               duration: trip?.duration,
+              contact: trip?.contact,
               description: trip?.description,
             }}
             validationSchema={validationSchema}
@@ -171,6 +177,22 @@ const TripDetail: React.FC = () => {
                 </IonItem>
                 <p className="error">
                   {formikProps.touched.duration && formikProps.errors.duration}
+                </p>
+
+                <IonItem>
+                  <IonLabel position="floating">
+                    Contact
+                  </IonLabel>
+                  <IonInput
+                    type="text"
+                    placeholder="Contact"
+                    name="contact"
+                    value={formikProps.values.contact}
+                    onIonChange={formikProps.handleChange}
+                  />
+                </IonItem>
+                <p className="error">
+                  {formikProps.touched.contact && formikProps.errors.contact}
                 </p>
 
                 <IonItem>
