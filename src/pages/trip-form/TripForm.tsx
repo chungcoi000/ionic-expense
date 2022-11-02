@@ -3,18 +3,17 @@ import {
   IonContent, IonDatetime,
   IonHeader,
   IonInput,
-  IonItem, IonLabel,
+  IonItem, IonLabel, IonModal,
   IonPage, IonPopover, IonSelect, IonSelectOption, IonTextarea,
   IonTitle, IonToast,
   IonToolbar
 } from "@ionic/react";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import "./TripForm.css";
 import {Form, Formik, FormikHelpers} from "formik";
 import * as yup from "yup";
-import {addTrip, getTripById} from "../../databaseHandler";
+import {addTrip} from "../../databaseHandler";
 import {useHistory} from "react-router";
-import {Trip} from "../../models/Trip";
 
 const validationSchema = yup.object({
   destination: yup
@@ -39,7 +38,11 @@ const TripForm: React.FC = () => {
   const [date, setDate] = useState<string>();
   const [risk, setRisk] = useState<string>("no");
   const [open, setOpen] = useState<boolean>(false);
+  const [modal, setModal] = useState<boolean>(false);
+  const [value, setValue] = useState<any>();
   const history = useHistory();
+
+  console.log(value);
 
   const dateSelectedHandler = (e: any) => {
     const selectedDate = new Date(e.detail.value);
@@ -52,11 +55,11 @@ const TripForm: React.FC = () => {
 
   const addTripDetail = async (values: any, actions: FormikHelpers<any>) => {
     let tripInfo = {...values, risk};
+    setValue(tripInfo);
     const res = await addTrip(tripInfo);
     if (res) {
       setOpen(true);
       actions.resetForm();
-      history.push("/home");
       setRisk("no");
       setDate("");
     }
@@ -178,6 +181,12 @@ const TripForm: React.FC = () => {
                   ></IonTextarea>
                 </IonItem>
                 <IonButton style={{margin: "20px"}} color="tertiary" expand="block" type="submit">SAVE</IonButton>
+                <IonModal isOpen={modal} title="Confirm information" onDidDismiss={() => setModal(false)}>
+                  <p>Test</p>
+                  <IonButton onClick={() => setModal(false)}>Close</IonButton>
+                  <IonButton type="submit">Save</IonButton>
+
+                </IonModal>
               </Form>
             )}
           </Formik>
@@ -191,6 +200,7 @@ const TripForm: React.FC = () => {
           position="top"
           color="success"
         />
+
       </IonContent>
     </IonPage>
   )

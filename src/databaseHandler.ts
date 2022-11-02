@@ -31,12 +31,13 @@ export async function deleteTripById(id: number) {
   return result;
 }
 
-export async function updateTripById(_id: any, tripInfo: Trip) {
+export async function updateTripById(id: any, tripInfo: Trip) {
+  console.log("trip");
   const db = await openDB(DATABASE_NAME, 1);
-  const trip = await db.get("trip", _id);
+  const trip = await db.get("trip", id);
   if (trip) {
-    const id = await db.put("trip", {tripInfo, id: _id});
-    return id;
+    const tripId = await db.put("trip", {...tripInfo, id});
+    return tripId;
   } else {
     console.log("This trip not found!");
   }

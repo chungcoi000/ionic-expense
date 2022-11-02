@@ -73,11 +73,11 @@ const TripDetail: React.FC = () => {
 
   const updateDetail = async (values: any) => {
     let tripInfo = {...values, risk};
-    const res = await updateTripById(id, tripInfo);
-    if (res) {
-      setOpen(true);
-      history.push("/home");
-    }
+    console.log("tripInfo", tripInfo);
+    console.log("id", id);
+
+    await updateTripById(id, tripInfo);
+
   }
 
   return (
