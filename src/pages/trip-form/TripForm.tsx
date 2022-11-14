@@ -56,8 +56,6 @@ const TripForm: React.FC = () => {
     setRisk(e.detail.value);
   }
 
-  console.log("values", value);
-
   const tripDetail = (values: any) => {
     let tripInfo = {...values, risk};
     setValue(tripInfo);

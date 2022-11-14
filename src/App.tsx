@@ -48,7 +48,7 @@ const App: React.FC = () => (
           <Route exact path="/add-trip">
             <TripForm />
           </Route>
-          <Route exact path="/trip">
+          <Route exact path="/trip/:id">
             <TripDetail />
           </Route>
           <Route exact path="/">

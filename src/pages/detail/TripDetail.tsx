@@ -8,14 +8,13 @@ import {
   IonTitle, IonToast,
   IonToolbar
 } from "@ionic/react";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./TripDetail.css";
-import {Form, Formik, FormikHelpers} from "formik";
+import {Form, Formik} from "formik";
 import * as yup from "yup";
-import {addTrip, getTripById, updateTripById} from "../../databaseHandler";
-import {useHistory, useLocation} from "react-router";
+import {getTripById, updateTripById} from "../../databaseHandler";
+import {useHistory, useParams} from "react-router";
 import {Trip} from "../../models/Trip";
-import queryString from "query-string";
 
 const validationSchema = yup.object({
   destination: yup
@@ -47,17 +46,13 @@ const TripDetail: React.FC = () => {
   const [trip, setTrip] = useState<Trip>({});
 
   const history = useHistory();
-  const location = useLocation();
-
-  const id = useMemo(() => {
-    const tripId = queryString.parse(location.search)._id;
-    return Number(tripId);
-  }, [location.search]);
+  const params = useParams<{ id: string }>();
+  const {id} = params;
 
 
   useEffect(() => {
     (async () => {
-      const data = await getTripById(id);
+      const data = await getTripById(Number(id));
       if (data) {
         setTrip(data);
         setDate(data.date);
@@ -78,8 +73,8 @@ const TripDetail: React.FC = () => {
   const updateDetail = async (values: any) => {
     let tripInfo = {...values, risk};
 
-    const data = await updateTripById(id, tripInfo);
-    if (data === id) {
+    const data = await updateTripById(Number(id), tripInfo);
+    if (data === Number(id)) {
       setOpen(true);
       history.push("/home");
     }

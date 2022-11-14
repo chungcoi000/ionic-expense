@@ -56,11 +56,6 @@ const Home: React.FC = () => {
     });
   }
 
-  const navigatePage = (id: any) => {
-    history.push("/trip");
-    history.replace({search: queryString.stringify({_id: id})});
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -73,8 +68,8 @@ const Home: React.FC = () => {
           {
             trips.length > 0 && trips.map((trip) => {
               return (
-                <IonItem key={trip.id} lines="none">
-                  <IonLabel style={{marginLeft: "10px"}} onClick={() => navigatePage(trip.id)}>
+                <IonItem key={trip.id} lines="none" style={{cursor: "pointer"}}>
+                  <IonLabel style={{marginLeft: "10px"}} onClick={() => history.push(`/trip/${trip.id}`)}>
                     <h2>{trip.name}</h2>
                     <p>{trip.date} - {trip.destination}</p>
                   </IonLabel>
